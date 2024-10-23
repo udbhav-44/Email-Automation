@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
+from email.mime.application import MIMEApplication  # Add this import
 
 
 # Load environment variables
@@ -22,7 +23,7 @@ password = os.getenv('EMAIL_PASSWORD')
 subject = "Application for SURF 2025 Research Internship Opportunity"
 
 
-def send_email(recipient):
+def send_email(recipient, attachment_path=None):
     try:
         # Setup the MIME
         message = MIMEMultipart()
@@ -33,17 +34,24 @@ def send_email(recipient):
         # Attach body text
         message.attach(MIMEText(body, 'plain'))
 
+        # Attach file if provided
+        if attachment_path and os.path.exists(attachment_path):
+            with open(attachment_path, 'rb') as f:
+                attachment = MIMEApplication(f.read(), _subtype='pdf')
+                attachment.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+                message.attach(attachment)
+
         # Connect to the server
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()  # Secure the connection
 
-        # Login to the email account
+        # Login 
         server.login(sender_email, password)
 
-        # Send the email
+        # Send 
         server.sendmail(sender_email, recipient, message.as_string())
 
-        # Quit the server
+        # Quit 
         server.quit()
 
         print(f"Email sent to {recipient}")
@@ -53,27 +61,24 @@ def send_email(recipient):
         
 
 
-# Path to the downloaded JSON credentials file
+# Google credentials file
 credentials_file = '/Users/udbhavagarwal/Desktop/emailing-439513-a3b6f953c7dd.json'
 
-# Define the scope (permissions required for your application)
+# scope (permissions required for your application)
 scope = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
-# Authorize the client using the credentials and the scope
+# Authorize the client 
 creds = Credentials.from_service_account_file(credentials_file, scopes=scope)
-
-# Connect to the Google Sheet
 client = gspread.authorize(creds)
 
-# Open the Google Sheet by name or IDexi
 spreadsheet = client.open("Intern_DB")  # or use open_by_key("<sheet_id>")
-sheet = spreadsheet.get_worksheet(1)  # Access the first sheet (use index or name)
+sheet = spreadsheet.get_worksheet(1)  # Access by worksheet 
 
 expected_headers = ["Professor","Mail Id","Writeup"]
-# Read data from the sheet
+
 data = sheet.get_all_records(expected_headers=expected_headers)
 
 df = pd.DataFrame(data)
@@ -99,7 +104,7 @@ Indian Institute of Technology, Kanpur
 """
     return body
 
-# Function to read sent emails from a file
+# read sent emails from a file
 def read_sent_emails(file_path):
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
@@ -108,12 +113,12 @@ def read_sent_emails(file_path):
         sent_emails = []
     return sent_emails
 
-# Function to write sent emails to a file
+#  write sent emails to a file
 def write_sent_email(file_path, email):
     with open(file_path, 'a') as file:
         file.write(email + '\n')
 
-# File to keep track of sent emails
+# keep track of sent emails
 sent_emails_file = 'sent_emails.txt'
 sent_emails = read_sent_emails(sent_emails_file)
 
@@ -124,7 +129,7 @@ for index, row in df.iterrows():
         professor_name = row['Professor']
         writeup = row['Writeup']
         body = add_body(professor_name, writeup)
-        send_email(recipient)
+        send_email(recipient, attachment_path='path/to/your/resume.pdf')  # Add your resume path here
         write_sent_email(sent_emails_file, recipient)
 
 
