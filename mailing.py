@@ -2,11 +2,19 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
+from dotenv import load_dotenv
+import gspread
+from google.oauth2.service_account import Credentials
+import pandas as pd
 
-smtp_server = "smtp.cc.iitk.ac.in"
-smtp_port = 25
-sender_email = "audbhav22@iitk.ac.in"
-password = "Udbhav44"
+
+# Load environment variables
+load_dotenv()
+
+smtp_server = os.getenv('SMTP_SERVER')
+smtp_port = int(os.getenv('SMTP_PORT', '25'))
+sender_email = os.getenv('SENDER_EMAIL')
+password = os.getenv('EMAIL_PASSWORD')
 
 # recipients = ["shubhangij22@iitk.ac.in", "audbhav22@iitk.ac.in"]
 
@@ -43,10 +51,7 @@ def send_email(recipient):
     except Exception as e:
         print(f"Failed to send email to {recipient}. Error: {e}")
         
-    
-import gspread
-from google.oauth2.service_account import Credentials
-import pandas as pd
+
 
 # Path to the downloaded JSON credentials file
 credentials_file = '/Users/udbhavagarwal/Desktop/emailing-439513-a3b6f953c7dd.json'

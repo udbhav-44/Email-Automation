@@ -1,9 +1,13 @@
 import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
+from dotenv import load_dotenv
+import os
 
+# Load environment variables
+load_dotenv()
 # Path to the downloaded JSON credentials file
-credentials_file = '/Users/udbhavagarwal/Desktop/emailing-439513-a3b6f953c7dd.json'
+credentials_file = os.getenv('CREDENTIALS_FILE')
 
 # Define the scope (permissions required for your application)
 scope = [
