@@ -6,10 +6,8 @@ from dotenv import load_dotenv
 import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
-from email.mime.application import MIMEApplication  # Add this import
+from email.mime.application import MIMEApplication  
 
-
-# Load environment variables
 load_dotenv()
 
 smtp_server = os.getenv('SMTP_SERVER')
@@ -19,7 +17,7 @@ password = os.getenv('EMAIL_PASSWORD')
 
 # recipients = ["shubhangij22@iitk.ac.in", "audbhav22@iitk.ac.in"]
 
-# Email content
+# Email Subject
 subject = "Application for SURF 2025 Research Internship Opportunity"
 
 
